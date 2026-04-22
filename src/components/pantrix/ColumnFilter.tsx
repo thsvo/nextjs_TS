@@ -37,7 +37,6 @@ export function ColumnFilter({ values, selected, onChange, label }: ColumnFilter
   }, [uniqueValues, search]);
 
   const active = selected !== null;
-  const allSelected = selected?.length === uniqueValues.length;
 
   const toggle = (v: string) => {
     const current = selected ?? uniqueValues.slice();

@@ -1,5 +1,5 @@
 // @mui
-import { Typography, Stack, Box } from '@mui/material';
+import { Typography, Stack } from '@mui/material';
 // components
 import Logo from '../../components/logo';
 //
@@ -9,7 +9,6 @@ import { StyledRoot, StyledSectionBg, StyledSection, StyledContent } from './sty
 
 type Props = {
   title?: string;
-  illustration?: string;
   children: React.ReactNode;
 };
 

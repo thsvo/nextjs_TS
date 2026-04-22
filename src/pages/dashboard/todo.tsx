@@ -68,7 +68,8 @@ export default function ToDoListPage() {
       await updateRestockCost(id, parseFloat(cost));
       setMessage({ type: 'success', text: 'Cost saved.' });
       setCosts((prev) => {
-        const { [id]: _, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[id];
         return rest;
       });
       fetchData();

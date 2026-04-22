@@ -42,7 +42,6 @@ import {
   getPrepopulateMenuItems,
   recompute,
   RecipeMappingItem,
-  RecipeMappingDetailRow,
   PrepopulateMenuItem,
 } from '../../../api/pantrix';
 import {

@@ -62,7 +62,8 @@ export default function PortioningRestockPage() {
       await portioningRestockAdd(portionUid, parseFloat(q));
       setMessage({ type: 'success', text: 'Portions added.' });
       setDrafts((prev) => {
-        const { [portionUid]: _, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[portionUid];
         return rest;
       });
       fetchData();

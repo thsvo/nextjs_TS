@@ -133,7 +133,8 @@ export default function StockTakePage() {
 
   const clearRow = (k: string) => {
     setCounts((prev) => {
-      const { [k]: _, ...rest } = prev;
+      const rest = { ...prev };
+      delete rest[k];
       return rest;
     });
   };

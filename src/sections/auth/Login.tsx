@@ -1,7 +1,7 @@
 // next
 import NextLink from 'next/link';
 // @mui
-import { Alert, Tooltip, Stack, Typography, Link, Box } from '@mui/material';
+import { Tooltip, Stack, Typography, Link, Box } from '@mui/material';
 // framer-motion
 import { m } from 'framer-motion';
 // auth
@@ -51,8 +51,6 @@ export default function Login() {
             />
           </Tooltip>
         </Stack>
-
-
 
         <m.div variants={varFadeInUp}>
           <AuthLoginForm />

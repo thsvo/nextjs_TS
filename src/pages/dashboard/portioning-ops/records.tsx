@@ -63,7 +63,8 @@ export default function PortioningRecordsPage() {
       await editPortioningRecord(id, parseFloat(raw) || 0);
       setMessage({ type: 'success', text: `Updated record #${id}.` });
       setDrafts((prev) => {
-        const { [id]: _, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[id];
         return rest;
       });
       fetchData();

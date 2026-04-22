@@ -95,7 +95,8 @@ export default function IngredientsUsedPage() {
       await updateIngredientLevel(ingredient, parseFloat(value) || 0);
       setMessage({ type: 'success', text: `${ingredient}: level updated.` });
       setEdits((prev) => {
-        const { [ingredient]: _, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[ingredient];
         return rest;
       });
       fetchData();
