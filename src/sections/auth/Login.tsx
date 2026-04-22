@@ -52,11 +52,7 @@ export default function Login() {
           </Tooltip>
         </Stack>
 
-        <m.div variants={varFadeInUp}>
-          <Alert severity="info" sx={{ mb: 3 }}>
-            Use email : <strong>demo@minimals.cc</strong> / password :<strong> demo1234</strong>
-          </Alert>
-        </m.div>
+
 
         <m.div variants={varFadeInUp}>
           <AuthLoginForm />

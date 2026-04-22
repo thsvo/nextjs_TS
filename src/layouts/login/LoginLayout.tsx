@@ -1,8 +1,7 @@
 // @mui
-import { Typography, Stack } from '@mui/material';
+import { Typography, Stack, Box } from '@mui/material';
 // components
 import Logo from '../../components/logo';
-import Image from '../../components/image';
 //
 import { StyledRoot, StyledSectionBg, StyledSection, StyledContent } from './styles';
 
@@ -14,7 +13,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function LoginLayout({ children, illustration, title }: Props) {
+export default function LoginLayout({ children, title }: Props) {
   return (
     <StyledRoot>
       <Logo
@@ -27,23 +26,20 @@ export default function LoginLayout({ children, illustration, title }: Props) {
       />
 
       <StyledSection>
-        <Typography variant="h3" sx={{ mb: 10, maxWidth: 480, textAlign: 'center' }}>
-          {title || 'Hi, Welcome back'}
-        </Typography>
-
-        <Image
-          disabledEffect
-          visibleByDefault
-          alt="auth"
-          src={illustration || '/assets/images/ai_inventory_hero.png'}
-          sx={{ maxWidth: 720, filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.3))' }}
-        />
+        <Stack spacing={2} sx={{ zIndex: 1, px: 5, textAlign: 'center', color: 'common.white' }}>
+          <Typography variant="h2" sx={{ fontWeight: 800, textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+            {title || 'Welcome back'}
+          </Typography>
+          <Typography variant="body1" sx={{ opacity: 0.8, maxWidth: 480 }}>
+            Experience the next generation of inventory management with AI-powered insights.
+          </Typography>
+        </Stack>
 
         <StyledSectionBg />
       </StyledSection>
 
       <StyledContent>
-        <Stack sx={{ width: 1 }}> {children} </Stack>
+        <Stack sx={{ width: 1, maxWidth: 400 }}> {children} </Stack>
       </StyledContent>
     </StyledRoot>
   );
