@@ -110,7 +110,23 @@ export default function GeneralAppPage() {
                   }}
                 />
               }
-              action={<Button variant="contained">Go Now</Button>}
+                            action={
+                <Button
+                  variant="contained"
+                  onClick={async () => {
+                    try {
+                      await axios.post('/recompute');
+                      alert('Recompute triggered successfully.');
+                      fetchData();
+                    } catch (error) {
+                      console.error('Recompute failed:', error);
+                      alert('Recompute failed.');
+                    }
+                  }}
+                >
+                  Recompute All Stock
+                </Button>
+              }
             />
           </Grid>
 

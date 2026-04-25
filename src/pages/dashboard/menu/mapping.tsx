@@ -41,9 +41,16 @@ import {
   getPrepopulateRecipe,
   getPrepopulateMenuItems,
   recompute,
+  addIngredient,
   RecipeMappingItem,
   PrepopulateMenuItem,
 } from '../../../api/pantrix';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import {
   FilterableHeader,
   applyColumnFilters,
@@ -88,6 +95,9 @@ export default function MenuMappingPage() {
   const [prepopOptions, setPrepopOptions] = useState<PrepopulateMenuItem[]>([]);
   const [prepopAnchor, setPrepopAnchor] = useState<HTMLElement | null>(null);
   const [prepopSearch, setPrepopSearch] = useState('');
+  const [openAddMenu, setOpenAddMenu] = useState(false);
+  const [newMenuName, setNewMenuName] = useState('');
+  const [addingMenu, setAddingMenu] = useState(false);
 
   const setFilter = (field: string, value: string[] | null) =>
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -242,6 +252,36 @@ export default function MenuMappingPage() {
     }
   };
 
+  const handleAddMenuItem = async () => {
+    if (!newMenuName.trim()) return;
+    setAddingMenu(true);
+    try {
+      // Create a 'Made in-house' ingredient with the same name.
+      // The backend _sync_made_ingredient_menu_items (triggered via recompute)
+      // will create the corresponding menu item.
+      await addIngredient({
+        ingredient: newMenuName,
+        category: 'Made in-house',
+        variant: 'Regular',
+        storage: 'Ambient',
+        unit: 'each',
+        quantity: 0,
+        origin_id: 'made',
+      } as any);
+      
+      await recompute();
+      
+      setMessage({ type: 'success', text: `Menu item "${newMenuName}" created.` });
+      setOpenAddMenu(false);
+      setNewMenuName('');
+      fetchSheet();
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.detail || 'Failed to create menu item.' });
+    } finally {
+      setAddingMenu(false);
+    }
+  };
+
   const prepopApply = async (menuItem: string) => {
     setPrepopAnchor(null);
     try {
@@ -333,6 +373,13 @@ export default function MenuMappingPage() {
                     startIcon={<Iconify icon="eva:refresh-fill" />}
                   >
                     Recalculate
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => setOpenAddMenu(true)}
+                    startIcon={<Iconify icon="eva:plus-fill" />}
+                  >
+                    Add Menu Item
                   </Button>
                 </Stack>
 
@@ -644,6 +691,35 @@ export default function MenuMappingPage() {
             </List>
           </Stack>
         </Popover>
+
+        <Dialog open={openAddMenu} onClose={() => !addingMenu && setOpenAddMenu(false)} fullWidth maxWidth="xs">
+          <DialogTitle>Add Menu Item</DialogTitle>
+          <DialogContent sx={{ pt: 1 }}>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Create a brand-new menu item. This will automatically create a corresponding &quot;Made in-house&quot; ingredient.
+            </Typography>
+            <TextField
+              fullWidth
+              autoFocus
+              label="Menu Item Name"
+              value={newMenuName}
+              onChange={(e) => setNewMenuName(e.target.value)}
+              disabled={addingMenu}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenAddMenu(false)} disabled={addingMenu}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleAddMenuItem}
+              disabled={!newMenuName.trim() || addingMenu}
+            >
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </>
   );

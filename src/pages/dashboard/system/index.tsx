@@ -63,7 +63,10 @@ export default function SystemPage() {
       setMessage({ type: 'success', text: r?.message || `${op} succeeded.` });
       refreshSummary();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.detail || `${op} failed.` });
+      const errorText = typeof err?.detail === 'string' 
+        ? err.detail 
+        : JSON.stringify(err?.detail || err?.error || `${op} failed.`);
+      setMessage({ type: 'error', text: errorText });
     } finally {
       setLoading(null);
     }
@@ -84,7 +87,10 @@ export default function SystemPage() {
       setIngredients(data);
       refreshSummary();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.detail || 'Delete failed.' });
+      const errorText = typeof err?.detail === 'string' 
+        ? err.detail 
+        : JSON.stringify(err?.detail || err?.error || 'Delete failed.');
+      setMessage({ type: 'error', text: errorText });
     } finally {
       setLoading(null);
     }

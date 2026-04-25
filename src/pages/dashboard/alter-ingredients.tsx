@@ -132,7 +132,10 @@ export default function AlterIngredientsPage() {
       setMessage({ type: 'success', text: 'All changes saved.' });
       fetchData();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.detail || 'Save failed.' });
+      const errorText = typeof err?.detail === 'string' 
+        ? err.detail 
+        : JSON.stringify(err?.detail || err?.error || 'Save failed.');
+      setMessage({ type: 'error', text: errorText });
     } finally {
       setSaving(false);
     }
@@ -255,14 +258,90 @@ export default function AlterIngredientsPage() {
                       const realIdx = rows.indexOf(row);
                       return (
                         <TableRow key={row.Ing_UID || row.Portion_UID || realIdx}>
-                          <TableCell sx={{ fontWeight: 'bold' }}>{row.ingredient}</TableCell>
-                          <TableCell>{row.category}</TableCell>
-                          <TableCell>{row.variant}</TableCell>
-                          {mode === 'base' && <TableCell>{row.subvariant}</TableCell>}
-                          <TableCell>{row.storage}</TableCell>
-                          <TableCell>{row.form}</TableCell>
-                          <TableCell>{row.origin_id || 'bought'}</TableCell>
-                          {mode === 'base' && <TableCell>{row.unit}</TableCell>}
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              value={row.ingredient || ''}
+                              sx={{ width: 150 }}
+                              onChange={(e) =>
+                                handleFieldChange(realIdx, 'ingredient', e.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              value={row.category || ''}
+                              sx={{ width: 120 }}
+                              onChange={(e) =>
+                                handleFieldChange(realIdx, 'category', e.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              value={row.variant || ''}
+                              sx={{ width: 120 }}
+                              onChange={(e) =>
+                                handleFieldChange(realIdx, 'variant', e.target.value)
+                              }
+                            />
+                          </TableCell>
+                          {mode === 'base' && (
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                value={row.subvariant || ''}
+                                sx={{ width: 100 }}
+                                onChange={(e) =>
+                                  handleFieldChange(realIdx, 'subvariant', e.target.value)
+                                }
+                              />
+                            </TableCell>
+                          )}
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              value={row.storage || ''}
+                              sx={{ width: 120 }}
+                              onChange={(e) =>
+                                handleFieldChange(realIdx, 'storage', e.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              value={row.form || ''}
+                              sx={{ width: 100 }}
+                              onChange={(e) =>
+                                handleFieldChange(realIdx, 'form', e.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              value={row.origin_id || 'bought'}
+                              sx={{ width: 100 }}
+                              onChange={(e) =>
+                                handleFieldChange(realIdx, 'origin_id', e.target.value)
+                              }
+                            />
+                          </TableCell>
+                          {mode === 'base' && (
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                value={row.unit || ''}
+                                sx={{ width: 80 }}
+                                onChange={(e) =>
+                                  handleFieldChange(realIdx, 'unit', e.target.value)
+                                }
+                              />
+                            </TableCell>
+                          )}
                           {mode === 'portioned' && (
                             <TableCell>
                               <TextField

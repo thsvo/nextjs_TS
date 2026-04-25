@@ -106,8 +106,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const user = {
           id: payload.restaurant_id,
           displayName: payload.sub,
-          email: payload.sub, // Mapping sub to email for compatibility
+          email: payload.sub,
           role: payload.role,
+          allowedPages: payload.allowed_pages || [],
         };
 
         dispatch({
@@ -148,7 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       username,
       password,
     });
-    const { token, role, restaurant_id } = response.data;
+    const { token, role, restaurant_id, allowed_pages } = response.data;
 
     setSession(token);
 
@@ -160,6 +161,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           displayName: username,
           email: username,
           role,
+          allowedPages: allowed_pages || [],
         },
       },
     });

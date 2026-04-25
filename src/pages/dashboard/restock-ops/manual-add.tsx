@@ -149,7 +149,10 @@ export default function ManualAddPage() {
       }
       setForm((prev) => ({ ...prev, quantity: 0, total_cost: '' }));
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.detail || err?.error || 'Save failed.' });
+      const errorText = typeof err?.detail === 'string' 
+        ? err.detail 
+        : JSON.stringify(err?.detail || err?.error || 'Save failed.');
+      setMessage({ type: 'error', text: errorText });
     }
   };
 

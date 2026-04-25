@@ -112,6 +112,12 @@ export default function StockTakePage() {
       const items = rows
         .filter((r) => counts[keyOf(r)] !== undefined)
         .map((r) => ({
+          ingredient: r.ingredient,
+          category: r.category,
+          variant: r.variant,
+          subvariant: r.subvariant,
+          storage: r.storage,
+          form: r.form,
           ing_uid: (r as any).ing_uid,
           portion_uid: (r as any).portion_uid,
           current_balance: r.current_balance,
@@ -125,7 +131,10 @@ export default function StockTakePage() {
       setMessage({ type: 'success', text: `Saved ${items.length} counts.` });
       fetchData();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.detail || 'Save failed.' });
+      const errorText = typeof err?.detail === 'string' 
+        ? err.detail 
+        : JSON.stringify(err?.detail || err?.message || 'Save failed.');
+      setMessage({ type: 'error', text: errorText });
     } finally {
       setSaving(false);
     }
@@ -244,6 +253,7 @@ export default function StockTakePage() {
                           setFilter={setFilter}
                         />
                       </TableCell>
+                      {type === 'portioning' && <TableCell>Portion Size</TableCell>}
                       <TableCell>
                         <FilterableHeader
                           label="Subvariant"
@@ -281,7 +291,7 @@ export default function StockTakePage() {
                   <TableBody>
                     {paginated.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={11} align="center">
+                        <TableCell colSpan={type === 'portioning' ? 12 : 11} align="center">
                           <Typography color="text.secondary">No ingredients found.</Typography>
                         </TableCell>
                       </TableRow>
@@ -297,6 +307,11 @@ export default function StockTakePage() {
                           <TableCell>{r.category}</TableCell>
                           <TableCell sx={{ fontWeight: 'bold' }}>{r.ingredient}</TableCell>
                           <TableCell>{r.variant}</TableCell>
+                          {type === 'portioning' && (
+                            <TableCell>
+                              {r.portion_size} {r.portion_unit}
+                            </TableCell>
+                          )}
                           <TableCell>{r.subvariant}</TableCell>
                           <TableCell>{r.storage}</TableCell>
                           <TableCell>{r.form}</TableCell>
