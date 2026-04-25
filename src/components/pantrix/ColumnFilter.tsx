@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Button,
   Typography,
+  TableCell,
 } from '@mui/material';
 import Iconify from '../iconify';
 
@@ -62,10 +63,20 @@ export function ColumnFilter({ values, selected, onChange, label }: ColumnFilter
         anchorEl={anchor}
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        PaperProps={{
+          sx: {
+            p: 0,
+            mt: 1.5,
+            ml: 0.5,
+            width: 260,
+            borderRadius: 1.5,
+            boxShadow: (theme) => theme.customShadows.dropdown,
+          },
+        }}
       >
-        <Box sx={{ p: 2, width: 260 }}>
+        <Box sx={{ p: 2 }}>
           {label && (
-            <Typography variant="caption" sx={{ display: 'block', mb: 1, fontWeight: 'bold' }}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, color: 'text.primary' }}>
               {label}
             </Typography>
           )}
@@ -75,42 +86,85 @@ export function ColumnFilter({ values, selected, onChange, label }: ColumnFilter
             placeholder="Search values…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{ mb: 1 }}
+            InputProps={{
+              startAdornment: (
+                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', mr: 1, width: 16 }} />
+              ),
+            }}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 1,
+              },
+            }}
           />
-          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-            <Button size="small" onClick={selectAll}>
+          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+            <Button
+              fullWidth
+              size="small"
+              variant="soft"
+              onClick={selectAll}
+              sx={{ borderRadius: 1 }}
+            >
               All
             </Button>
-            <Button size="small" color="error" onClick={clearAll}>
+            <Button
+              fullWidth
+              size="small"
+              variant="soft"
+              color="error"
+              onClick={clearAll}
+              sx={{ borderRadius: 1 }}
+            >
               None
             </Button>
           </Stack>
-          <Box sx={{ maxHeight: 240, overflowY: 'auto' }}>
+          <Box
+            sx={{
+              maxHeight: 240,
+              overflowY: 'auto',
+              pr: 0.5,
+              '&::-webkit-scrollbar': { width: 5 },
+              '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 1 },
+            }}
+          >
             {filteredValues.map((v) => {
               const checked = selected === null ? true : selected.includes(v);
               return (
                 <FormControlLabel
                   key={v}
-                  sx={{ display: 'flex', my: 0 }}
+                  sx={{
+                    display: 'flex',
+                    m: 0,
+                    p: 0.5,
+                    borderRadius: 1,
+                    '&:hover': { bgcolor: 'background.neutral' },
+                  }}
                   control={
                     <Checkbox
                       size="small"
                       checked={checked}
                       onChange={() => toggle(v)}
+                      sx={{ p: 0.5 }}
                     />
                   }
-                  label={<Typography variant="body2">{v}</Typography>}
+                  label={
+                    <Typography variant="body2" sx={{ ml: 1 }}>
+                      {v}
+                    </Typography>
+                  }
                 />
               );
             })}
             {filteredValues.length === 0 && (
-              <Typography variant="caption" color="text.secondary">
-                No matches.
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center', py: 2 }}>
+                No matches found.
               </Typography>
             )}
           </Box>
         </Box>
       </Popover>
+
     </>
   );
 }
@@ -126,17 +180,20 @@ export type ColumnFilterHeaderProps = {
 export function FilterableHeader({ label, rows, field, filters, setFilter }: ColumnFilterHeaderProps) {
   const values = rows.map((r) => String(r?.[field] ?? '').trim() || '(blank)');
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
-      {label}
-      <ColumnFilter
-        values={values}
-        selected={filters[field] ?? null}
-        onChange={(sel) => setFilter(field, sel)}
-        label={`Filter ${label}`}
-      />
-    </Box>
+    <TableCell>
+      <Box sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+        {label}
+        <ColumnFilter
+          values={values}
+          selected={filters[field] ?? null}
+          onChange={(sel) => setFilter(field, sel)}
+          label={`Filter ${label}`}
+        />
+      </Box>
+    </TableCell>
   );
 }
+
 
 export function applyColumnFilters<T extends Record<string, any>>(
   rows: T[],

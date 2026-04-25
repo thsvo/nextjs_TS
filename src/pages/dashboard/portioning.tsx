@@ -296,62 +296,111 @@ export default function PortioningPage() {
       </Head>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        <Card>
-          <CardHeader
-            title="Portioning"
-            subheader="Divide bulk ingredients into smaller portions and record wastage."
-          />
-          <CardContent>
+        <Stack spacing={3}>
+          <Card
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              boxShadow: (theme) => theme.customShadows.z8,
+              background: (theme) =>
+                `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.background.neutral} 100%)`,
+            }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+              <Box>
+                <Typography variant="h4" gutterBottom>
+                  Portioning
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Divide bulk ingredients into smaller portions and record wastage efficiently.
+                </Typography>
+              </Box>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  onClick={fetchSheet}
+                  variant="soft"
+                  startIcon={<Iconify icon="eva:refresh-outline" />}
+                >
+                  Refresh
+                </Button>
+                <Button
+                  onClick={handleExport}
+                  variant="soft"
+                  color="info"
+                  startIcon={<Iconify icon="eva:download-outline" />}
+                >
+                  Export
+                </Button>
+              </Stack>
+            </Stack>
+
             <Stack
               direction={{ xs: 'column', md: 'row' }}
               spacing={2}
-              sx={{ mb: 2 }}
-              alignItems={{ md: 'center' }}
+              sx={{ mb: 3 }}
             >
               <TextField
-                size="small"
-                label="Search ingredients"
+                fullWidth
+                size="medium"
+                placeholder="Search by ingredient, category, origin..."
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
                   setPage(0);
                 }}
-                sx={{ minWidth: 280 }}
-              />
-              <Button
-                onClick={() => {
-                  setFilters({});
-                  setSearch('');
+                InputProps={{
+                  startAdornment: (
+                    <Iconify
+                      icon="eva:search-fill"
+                      sx={{ color: 'text.disabled', mr: 1, width: 20, height: 20 }}
+                    />
+                  ),
                 }}
-                variant="outlined"
-              >
-                Clear filters
-              </Button>
-              <Button onClick={fetchSheet} variant="outlined">
-                Refresh
-              </Button>
-              <Button onClick={handleExport} variant="outlined">
-                Export to Excel
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setRowsPerPage(showAll ? 10 : 100000)}
-              >
-                {showAll ? 'Paginated' : 'Show all'}
-              </Button>
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 1.5,
+                    bgcolor: 'background.paper',
+                  },
+                }}
+              />
+              <Stack direction="row" spacing={1} flexShrink={0}>
+                <Button
+                  onClick={() => {
+                    setFilters({});
+                    setSearch('');
+                  }}
+                  variant="outlined"
+                  color="inherit"
+                  sx={{ borderRadius: 1.5, px: 3 }}
+                >
+                  Clear
+                </Button>
+                <Button
+                  variant="soft"
+                  color="primary"
+                  onClick={() => setRowsPerPage(showAll ? 10 : 100000)}
+                  sx={{ borderRadius: 1.5, px: 3 }}
+                >
+                  {showAll ? 'Paginate' : 'Show All'}
+                </Button>
+              </Stack>
             </Stack>
 
-            {status && (
-              <Alert severity={status.type} onClose={() => setStatus(null)} sx={{ mb: 2 }}>
+            {status && !source && (
+              <Alert
+                severity={status.type}
+                onClose={() => setStatus(null)}
+                sx={{ mb: 3, borderRadius: 1.5 }}
+              >
                 {status.text}
               </Alert>
             )}
 
-            {loading && <LinearProgress sx={{ mb: 1 }} />}
+            {loading && <LinearProgress sx={{ mb: 2, borderRadius: 1, height: 6 }} />}
 
-            <TableContainer>
+            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <Scrollbar>
-                <Table size="small" sx={{ minWidth: 960 }}>
+                <Table size="medium" sx={{ minWidth: 960 }}>
                   <TableHead>
                     <TableRow>
                       <FilterableHeader
@@ -396,7 +445,7 @@ export default function PortioningPage() {
                         filters={filters}
                         setFilter={setFilter}
                       />
-                      <TableCell align="right">Quantity</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
                       <FilterableHeader
                         label="Unit"
                         field="unit"
@@ -411,7 +460,7 @@ export default function PortioningPage() {
                         filters={filters}
                         setFilter={setFilter}
                       />
-                      <TableCell align="center">Action</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -420,23 +469,41 @@ export default function PortioningPage() {
                         key={`${row.Ing_UID}-${i}`}
                         hover
                         selected={source?.Ing_UID === row.Ing_UID}
+                        sx={{
+                          '&.Mui-selected': {
+                            bgcolor: (theme) => theme.palette.primary.lighter,
+                            '&:hover': {
+                              bgcolor: (theme) => theme.palette.primary.lighter,
+                            },
+                          },
+                        }}
                       >
                         <TableCell>{row.category}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{row.ingredient}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          {row.ingredient}
+                        </TableCell>
                         <TableCell>{row.variant}</TableCell>
                         <TableCell>{row.subvariant}</TableCell>
                         <TableCell>{row.storage}</TableCell>
                         <TableCell>{row.form}</TableCell>
                         <TableCell align="right">
-                          {Number(row.quantity || 0).toFixed(2)}
+                          <Typography variant="subtitle2">
+                            {Number(row.quantity || 0).toFixed(2)}
+                          </Typography>
                         </TableCell>
                         <TableCell>{row.unit}</TableCell>
-                        <TableCell>{row.origin_id}</TableCell>
+                        <TableCell>
+                          <Typography variant="caption" sx={{ px: 1, py: 0.5, borderRadius: 1, bgcolor: 'background.neutral' }}>
+                            {row.origin_id}
+                          </Typography>
+                        </TableCell>
                         <TableCell align="center">
                           <Button
                             size="small"
                             variant="contained"
+                            color="primary"
                             onClick={() => handleOpen(row)}
+                            sx={{ borderRadius: 1 }}
                           >
                             Open
                           </Button>
@@ -445,8 +512,13 @@ export default function PortioningPage() {
                     ))}
                     {!paged.length && !loading && (
                       <TableRow>
-                        <TableCell colSpan={10} align="center" sx={{ color: 'text.secondary' }}>
-                          No ingredients found.
+                        <TableCell colSpan={10} align="center" sx={{ py: 8 }}>
+                          <Stack alignItems="center" spacing={1}>
+                            <Iconify icon="eva:cube-outline" width={48} sx={{ color: 'text.disabled' }} />
+                            <Typography variant="h6" color="text.secondary">
+                              No ingredients found
+                            </Typography>
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     )}
@@ -469,40 +541,91 @@ export default function PortioningPage() {
                 rowsPerPageOptions={[10, 25, 50, 100]}
               />
             )}
-          </CardContent>
-        </Card>
+          </Card>
 
-        {source && (
-          <Card id="portioning-detail" sx={{ mt: 3 }}>
-            <CardHeader
-              title={`Portioning: ${source.ingredient}`}
-              subheader={
-                <Typography variant="body2">
-                  Available:{' '}
-                  <strong>
-                    {Number(source.quantity || 0).toFixed(2)} {source.unit}
-                  </strong>
-                </Typography>
-              }
-              action={
-                <IconButton onClick={() => setSource(null)}>
-                  <Iconify icon="eva:close-outline" />
+          {source && (
+            <Card
+              id="portioning-detail"
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                boxShadow: (theme) => theme.customShadows.z20,
+                border: (theme) => `1px solid ${theme.palette.primary.main}`,
+              }}
+            >
+              <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 3 }}>
+                <Box>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="h5">Portioning: {source.ingredient}</Typography>
+                    <Typography
+                      variant="overline"
+                      sx={{
+                        px: 1,
+                        borderRadius: 1,
+                        bgcolor: 'primary.lighter',
+                        color: 'primary.darker',
+                      }}
+                    >
+                      Active
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                    Configure portions and calculate wastage for the selected batch.
+                  </Typography>
+                </Box>
+                <IconButton onClick={() => setSource(null)} sx={{ bgcolor: 'background.neutral' }}>
+                  <Iconify icon="eva:close-fill" />
                 </IconButton>
-              }
-            />
-            <CardContent>
-              <TableContainer sx={{ mb: 2 }}>
+              </Stack>
+
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mb: 4 }}>
+                <Box
+                  sx={{
+                    p: 2,
+                    flex: 1,
+                    borderRadius: 1.5,
+                    bgcolor: 'background.neutral',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'text.secondary' }}>Available</Typography>
+                  <Typography variant="h4" color="primary.main">
+                    {Number(source.quantity || 0).toFixed(2)} <small>{source.unit}</small>
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    p: 2,
+                    flex: 1,
+                    borderRadius: 1.5,
+                    bgcolor: 'error.lighter',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'error.main' }}>Wastage</Typography>
+                  <Typography variant="h4" color="error.main">
+                    {wastage.toFixed(2)} <small>{source.unit}</small>
+                  </Typography>
+                </Box>
+              </Stack>
+
+              {status && (
+                <Alert severity={status.type} sx={{ mb: 3, borderRadius: 1.5 }}>
+                  {status.text}
+                </Alert>
+              )}
+
+              <TableContainer sx={{ mb: 3, borderRadius: 1.5, border: (theme) => `1px solid ${theme.palette.divider}` }}>
                 <Scrollbar>
-                  <Table size="small" sx={{ minWidth: 960 }}>
-                    <TableHead>
+                  <Table size="medium">
+                    <TableHead sx={{ bgcolor: 'background.neutral' }}>
                       <TableRow>
                         <TableCell>Ingredient</TableCell>
-                        <TableCell>Category</TableCell>
                         <TableCell>Variant</TableCell>
                         <TableCell>Subvariant</TableCell>
                         <TableCell>Storage</TableCell>
                         <TableCell>Form</TableCell>
-                        <TableCell align="right">Portion size</TableCell>
+                        <TableCell align="right">Portion Size</TableCell>
                         <TableCell>Unit</TableCell>
                         <TableCell align="right"># Portions</TableCell>
                         <TableCell align="right">Total</TableCell>
@@ -512,90 +635,94 @@ export default function PortioningPage() {
                     <TableBody>
                       {rows.map((row, idx) => (
                         <TableRow key={idx}>
-                          <TableCell>
+                          <TableCell sx={{ minWidth: 160 }}>
                             <TextField
+                              fullWidth
                               size="small"
+                              variant="standard"
                               value={row.ingredient}
                               onChange={(e) => updateRow(idx, { ingredient: e.target.value })}
                             />
                           </TableCell>
-                          <TableCell>{row.category}</TableCell>
-                          <TableCell>
+                          <TableCell sx={{ minWidth: 120 }}>
                             <TextField
+                              fullWidth
                               size="small"
+                              variant="standard"
                               value={row.variant}
                               onChange={(e) => updateRow(idx, { variant: e.target.value })}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ minWidth: 120 }}>
                             <TextField
+                              fullWidth
                               size="small"
+                              variant="standard"
                               value={row.subvariant}
                               onChange={(e) => updateRow(idx, { subvariant: e.target.value })}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ minWidth: 120 }}>
                             <TextField
+                              fullWidth
                               size="small"
+                              variant="standard"
                               value={row.storage}
                               onChange={(e) => updateRow(idx, { storage: e.target.value })}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ minWidth: 120 }}>
                             <TextField
+                              fullWidth
                               size="small"
+                              variant="standard"
                               value={row.form}
                               onChange={(e) => updateRow(idx, { form: e.target.value })}
                             />
                           </TableCell>
-                          <TableCell align="right">
+                          <TableCell align="right" sx={{ minWidth: 100 }}>
                             <TextField
                               size="small"
                               type="number"
+                              variant="outlined"
                               value={row.portion_size ?? ''}
                               onChange={(e) =>
                                 updateRow(idx, {
-                                  portion_size:
-                                    e.target.value === ''
-                                      ? null
-                                      : parseFloat(e.target.value),
+                                  portion_size: e.target.value === '' ? null : parseFloat(e.target.value),
                                 })
                               }
-                              sx={{ width: 100 }}
-                              inputProps={{ min: 0, step: 'any' }}
+                              inputProps={{ min: 0, step: 'any', style: { textAlign: 'right' } }}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ minWidth: 80 }}>
                             <TextField
+                              fullWidth
                               size="small"
+                              variant="standard"
                               value={row.portion_unit}
                               onChange={(e) => updateRow(idx, { portion_unit: e.target.value })}
-                              sx={{ width: 80 }}
                             />
                           </TableCell>
-                          <TableCell align="right">
+                          <TableCell align="right" sx={{ minWidth: 100 }}>
                             <TextField
                               size="small"
                               type="number"
+                              variant="outlined"
                               value={row.portion_number ?? ''}
                               onChange={(e) =>
                                 updateRow(idx, {
-                                  portion_number:
-                                    e.target.value === ''
-                                      ? null
-                                      : parseFloat(e.target.value),
+                                  portion_number: e.target.value === '' ? null : parseFloat(e.target.value),
                                 })
                               }
-                              sx={{ width: 100 }}
-                              inputProps={{ min: 0, step: 'any' }}
+                              inputProps={{ min: 0, step: 'any', style: { textAlign: 'right' } }}
                             />
                           </TableCell>
-                          <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                          <TableCell align="right" sx={{ fontWeight: 'bold', minWidth: 80 }}>
                             {Number(row.total_quantity || 0).toFixed(2)}
                           </TableCell>
                           <TableCell align="center">
                             {rows.length > 1 && (
-                              <IconButton size="small" onClick={() => removeRow(idx)}>
+                              <IconButton color="error" size="small" onClick={() => removeRow(idx)}>
                                 <Iconify icon="eva:trash-2-outline" />
                               </IconButton>
                             )}
@@ -603,29 +730,19 @@ export default function PortioningPage() {
                         </TableRow>
                       ))}
                       <TableRow sx={{ bgcolor: 'warning.lighter' }}>
-                        <TableCell colSpan={9} sx={{ fontWeight: 600 }}>
-                          Keep inventory
+                        <TableCell colSpan={8} sx={{ fontWeight: 'bold' }}>
+                          Keep Inventory
                         </TableCell>
                         <TableCell align="right">
                           <TextField
                             size="small"
                             type="number"
+                            variant="outlined"
                             value={keepQty || ''}
-                            onChange={(e) =>
-                              setKeepQty(parseFloat(e.target.value) || 0)
-                            }
-                            sx={{ width: 100 }}
-                            inputProps={{ min: 0, step: 'any' }}
+                            onChange={(e) => setKeepQty(parseFloat(e.target.value) || 0)}
+                            inputProps={{ min: 0, step: 'any', style: { textAlign: 'right', fontWeight: 'bold' } }}
+                            sx={{ width: 120, bgcolor: 'background.paper' }}
                           />
-                        </TableCell>
-                        <TableCell />
-                      </TableRow>
-                      <TableRow sx={{ bgcolor: 'error.lighter' }}>
-                        <TableCell colSpan={9} sx={{ fontWeight: 600, color: 'error.main' }}>
-                          Wastage
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 600, color: 'error.main' }}>
-                          {wastage.toFixed(2)}
                         </TableCell>
                         <TableCell />
                       </TableRow>
@@ -634,27 +751,44 @@ export default function PortioningPage() {
                 </Scrollbar>
               </TableContainer>
 
-              <Divider sx={{ my: 2 }} />
-
               <Stack direction="row" spacing={2} justifyContent="flex-end">
-                <Button variant="outlined" startIcon={<Iconify icon="eva:plus-outline" />} onClick={addRow}>
-                  Add row
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                  onClick={addRow}
+                  sx={{ borderRadius: 1 }}
+                >
+                  Add Row
                 </Button>
-                <Button variant="outlined" onClick={() => setSource(null)}>
+                <Button
+                  variant="soft"
+                  color="inherit"
+                  onClick={() => setSource(null)}
+                  sx={{ borderRadius: 1 }}
+                >
                   Cancel
                 </Button>
-                <Button variant="contained" onClick={handleSave} disabled={saving}>
-                  {saving ? 'Saving…' : 'Save portioning'}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={handleSave}
+                  disabled={saving}
+                  sx={{ borderRadius: 1, px: 4 }}
+                >
+                  {saving ? 'Saving...' : 'Save Portioning'}
                 </Button>
               </Stack>
 
-              {saving && <LinearProgress sx={{ mt: 2 }} />}
-            </CardContent>
-          </Card>
-        )}
+              {saving && <LinearProgress sx={{ mt: 3, borderRadius: 1 }} />}
+            </Card>
+          )}
 
-        <Box sx={{ mt: 3 }} />
+          <Box sx={{ pb: 5 }} />
+        </Stack>
       </Container>
     </>
   );
 }
+
